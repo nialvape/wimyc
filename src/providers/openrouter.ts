@@ -10,6 +10,7 @@ export function createOpenRouterProvider(config: Config): ChatProvider | null {
     apiKey: config.OPENROUTER_API_KEY!,
     model: config.OPENROUTER_MODEL!,
     timeoutMs: config.HTTP_TIMEOUT_MS,
+    temperature: config.LLM_TEMPERATURE,
     extraHeaders: {
       ...(config.PUBLIC_BASE_URL ? { 'HTTP-Referer': config.PUBLIC_BASE_URL } : {}),
       'X-Title': 'WIMYC',

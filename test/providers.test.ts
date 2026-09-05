@@ -9,6 +9,7 @@ const config = {
   GROQ_API_KEY: 'gsk-test',
   GROQ_LLM: 'openai/gpt-oss-20b',
   GROQ_REASONING_EFFORT: 'low',
+  LLM_TEMPERATURE: 0.5,
   OPENROUTER_BASE_URL: 'https://openrouter.ai/api/v1',
   OPENROUTER_API_KEY: 'or-test',
   OPENROUTER_MODEL: 'meta-llama/llama-3.3-70b-instruct',
@@ -35,13 +36,13 @@ afterEach(() => {
 });
 
 describe('provider de Groq', () => {
-  it('manda temperature 1, no 0', async () => {
+  it('manda la temperature del .env', async () => {
     const body = captureBody();
     await createGroqProvider(config).chatJson([{ role: 'user', content: 'hola' }]);
 
-    // Los modelos de razonamiento están recomendados a 1; en 0 devuelven
-    // content vacío y Groq rechaza con 400 json_validate_failed.
-    expect(body().temperature).toBe(1);
+    // El formato lo fija response_format, así que la temperature sólo regula
+    // cuánto se suelta el modelo al interpretar.
+    expect(body().temperature).toBe(0.5);
   });
 
   it('acota el razonamiento para que quede presupuesto para el JSON', async () => {
@@ -68,6 +69,6 @@ describe('provider de OpenRouter', () => {
     await createOpenRouterProvider(config)!.chatJson([{ role: 'user', content: 'hola' }]);
 
     expect(body()).not.toHaveProperty('reasoning_effort');
-    expect(body().temperature).toBe(1);
+    expect(body().temperature).toBe(0.5);
   });
 });

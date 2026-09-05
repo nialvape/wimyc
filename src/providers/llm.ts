@@ -48,6 +48,7 @@ export class OpenAICompatibleProvider implements ChatProvider {
       apiKey: string;
       model: string;
       timeoutMs: number;
+      temperature: number;
       extraHeaders?: Record<string, string>;
       /** Campos extra del body, para parámetros propios de cada proveedor. */
       extraBody?: Record<string, unknown>;
@@ -65,10 +66,7 @@ export class OpenAICompatibleProvider implements ChatProvider {
       body: JSON.stringify({
         model: this.options.model,
         messages,
-        // 1 y no 0: los modelos de razonamiento están recomendados a
-        // temperature 1, y en 0 tienden a degenerar y devolver content vacío.
-        // El formato lo fija response_format, no la temperatura.
-        temperature: 1,
+        temperature: this.options.temperature,
         response_format: { type: 'json_object' },
         ...this.options.extraBody,
       }),

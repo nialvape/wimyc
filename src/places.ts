@@ -13,8 +13,13 @@
 export const CITY_HINT = 'la Ciudad Autónoma de Buenos Aires (CABA) y el conurbano bonaerense';
 
 /**
- * Va en el `prompt` de Whisper. A propósito es apenas una pista de acento, no
- * un diccionario de calles: Whisper transcribe lo que escucha y el que arregla
- * los nombres mal transcritos es el LLM, que tiene contexto para hacerlo bien.
+ * Va en el `prompt` de Whisper: pista de acento, registro y dominio.
+ *
+ * Sigue sin ser un diccionario de calles a propósito. Nombrar el tipo de
+ * contenido ayuda a decodificar; enumerar calles concretas empuja a Whisper a
+ * escuchar esas calles aunque el usuario haya dicho otra. Corregir los nombres
+ * mal transcritos es trabajo del LLM, que tiene contexto para hacerlo.
  */
-export const STT_PROMPT = 'Nota de voz en español rioplatense.';
+export const STT_PROMPT =
+  'Nota de voz en español rioplatense. Direcciones en Buenos Aires, CABA, conurbano. ' +
+  'Intersecciones. Lunfardo, porteño.';
