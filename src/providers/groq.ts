@@ -10,9 +10,10 @@ export function createGroqProvider(config: Config): ChatProvider {
     model: config.GROQ_LLM,
     timeoutMs: config.HTTP_TIMEOUT_MS,
     temperature: config.LLM_TEMPERATURE,
-    // Acotar el razonamiento deja presupuesto para el JSON. Sin esto gpt-oss
-    // se gasta la salida razonando y Groq rechaza la generación vacía con
-    // 400 json_validate_failed.
+    // Interpretar una dirección dictada mal transcrita necesita razonar, así
+    // que no lo apretamos más de la cuenta. Si vuelve el 400
+    // json_validate_failed —gpt-oss gastando toda la salida en razonar— la
+    // palanca es bajarlo, no subirlo.
     extraBody:
       config.GROQ_REASONING_EFFORT === 'off'
         ? {}

@@ -8,7 +8,7 @@ const config = {
   GROQ_BASE_URL: 'https://api.groq.com/openai/v1',
   GROQ_API_KEY: 'gsk-test',
   GROQ_LLM: 'openai/gpt-oss-20b',
-  GROQ_REASONING_EFFORT: 'low',
+  GROQ_REASONING_EFFORT: 'medium',
   LLM_TEMPERATURE: 0.5,
   OPENROUTER_BASE_URL: 'https://openrouter.ai/api/v1',
   OPENROUTER_API_KEY: 'or-test',
@@ -45,11 +45,11 @@ describe('provider de Groq', () => {
     expect(body().temperature).toBe(0.5);
   });
 
-  it('acota el razonamiento para que quede presupuesto para el JSON', async () => {
+  it('manda el reasoning_effort del .env', async () => {
     const body = captureBody();
     await createGroqProvider(config).chatJson([{ role: 'user', content: 'hola' }]);
 
-    expect(body().reasoning_effort).toBe('low');
+    expect(body().reasoning_effort).toBe('medium');
     expect(body().response_format).toEqual({ type: 'json_object' });
   });
 

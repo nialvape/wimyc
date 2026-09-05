@@ -21,7 +21,7 @@ const EnvSchema = z.object({
   GROQ_LLM: z.string().min(1),
   // Sólo lo entienden los modelos de razonamiento (gpt-oss). 'off' lo omite,
   // para poder cambiar a un modelo que rechace el parámetro.
-  GROQ_REASONING_EFFORT: z.enum(['off', 'low', 'medium', 'high']).default('low'),
+  GROQ_REASONING_EFFORT: z.enum(['off', 'low', 'medium', 'high']).default('medium'),
   // El formato lo fija response_format, así que esto sólo regula cuánto se
   // suelta el modelo al interpretar. Se toca seguido: mejor en el .env.
   LLM_TEMPERATURE: z.coerce.number().min(0).max(2).default(0.5),
