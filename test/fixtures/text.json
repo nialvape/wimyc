@@ -1,0 +1,12 @@
+{
+  "message": {
+    "id": "wamid.TEXT001",
+    "timestamp": "1730092800",
+    "type": "text",
+    "from": "5491122334455",
+    "text": { "body": "dejé el auto en Cabildo 2200, cochera nivel 2" },
+    "kapso": { "direction": "inbound", "status": "received", "processing_status": "pending" }
+  },
+  "conversation": { "id": "conv_123", "phone_number": "5491122334455", "contact_name": "Joaco" },
+  "phone_number_id": "123456789012345"
+}

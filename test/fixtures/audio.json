@@ -1,0 +1,16 @@
+{
+  "message": {
+    "id": "wamid.AUDIO001",
+    "timestamp": "1730093100",
+    "type": "audio",
+    "from": "5491122334455",
+    "audio": { "id": "media_id_456", "mime_type": "audio/ogg; codecs=opus" },
+    "kapso": {
+      "direction": "inbound",
+      "media_url": "https://api.kapso.ai/media/abc123.ogg",
+      "transcript": { "text": "dejé el auto en cabilo dos mil doscientos" }
+    }
+  },
+  "conversation": { "id": "conv_123", "phone_number": "5491122334455" },
+  "phone_number_id": "123456789012345"
+}

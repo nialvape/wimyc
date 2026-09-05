@@ -1,0 +1,15 @@
+{
+  "message": {
+    "id": "wamid.BTN001",
+    "timestamp": "1730093500",
+    "type": "interactive",
+    "from": "5491122334455",
+    "interactive": {
+      "type": "button_reply",
+      "button_reply": { "id": "confirm:1", "title": "Confirmar" }
+    },
+    "kapso": { "direction": "inbound" }
+  },
+  "conversation": { "id": "conv_123", "phone_number": "5491122334455" },
+  "phone_number_id": "123456789012345"
+}

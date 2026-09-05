@@ -1,0 +1,17 @@
+{
+  "message": {
+    "id": "wamid.LOC001",
+    "timestamp": "1730093400",
+    "type": "location",
+    "from": "5491199887766",
+    "location": {
+      "latitude": -34.5627,
+      "longitude": -58.4583,
+      "name": "Av. Cabildo 2200",
+      "address": "Av. Cabildo 2200, Belgrano, CABA"
+    },
+    "kapso": { "direction": "inbound" }
+  },
+  "conversation": { "id": "conv_999", "phone_number": "5491199887766" },
+  "phone_number_id": "123456789012345"
+}
