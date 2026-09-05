@@ -1,8 +1,9 @@
 import { AccessGate } from './auth.js';
 import { loadConfig } from './config.js';
 import { openDatabase } from './db/index.js';
+import { errorFields } from './providers/errors.js';
 import { Repo } from './db/repo.js';
-import { getLogger } from './logger.js';
+import { getLogger, maskPhone } from './logger.js';
 import { handleMessage } from './pipeline/handle.js';
 import type { AppContext } from './pipeline/context.js';
 import { createGroqProvider, GroqTranscriber } from './providers/groq.js';
@@ -27,14 +28,14 @@ async function main(): Promise<void> {
   else logger.warn('OpenRouter no configurado: el LLM no tiene fallback');
 
   const queue = new SerialQueue((error, key) => {
-    logger.error({ err: error, key }, 'tarea de la cola falló');
+    logger.error({ ...errorFields(error), key: maskPhone(key) }, 'tarea de la cola falló');
   });
 
   const context: AppContext = {
     repo,
     kapso: new KapsoClient(config),
     llm: withFallback(providers, (failed, error) => {
-      logger.warn({ err: error, provider: failed }, 'proveedor de LLM falló, voy al siguiente');
+      logger.warn({ ...errorFields(error), failed }, 'proveedor de LLM caído, voy al siguiente');
     }),
     transcriber: new GroqTranscriber(config),
     gate: new AccessGate(repo, config.ACCESS_PASSWORD, config.PASSWORD_ATTEMPTS_PER_HOUR),

@@ -1,5 +1,6 @@
 import type { Config } from '../config.js';
 import { STT_PROMPT } from '../places.js';
+import { ProviderError, readErrorBody } from './errors.js';
 import { OpenAICompatibleProvider, type ChatProvider } from './llm.js';
 
 export function createGroqProvider(config: Config): ChatProvider {
@@ -40,13 +41,12 @@ export class GroqTranscriber implements Transcriber {
     );
 
     if (!response.ok) {
-      const detail = await response.text().catch(() => '');
-      throw new Error(`Groq STT respondió ${response.status}: ${detail.slice(0, 300)}`);
+      throw new ProviderError('groq-stt', response.status, await readErrorBody(response));
     }
 
     const payload = (await response.json()) as { text?: string };
     const text = payload.text?.trim();
-    if (!text) throw new Error('Groq STT devolvió una transcripción vacía');
+    if (!text) throw new ProviderError('groq-stt', 200, 'transcripción vacía');
     return text;
   }
 }

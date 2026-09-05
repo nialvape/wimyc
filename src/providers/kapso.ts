@@ -1,4 +1,5 @@
 import type { Config } from '../config.js';
+import { ProviderError, readErrorBody } from './errors.js';
 
 export interface Button {
   /** Máximo 256 caracteres. Le metemos el id del parking adentro. */
@@ -75,7 +76,7 @@ export class KapsoClient implements Messenger {
     });
 
     if (!response.ok) {
-      throw new Error(`no pude bajar el audio: ${response.status} ${await safeText(response)}`);
+      throw new ProviderError('kapso-media', response.status, await readErrorBody(response));
     }
     return Buffer.from(await response.arrayBuffer());
   }
@@ -87,7 +88,7 @@ export class KapsoClient implements Messenger {
     });
 
     if (!response.ok) {
-      throw new Error(`no pude resolver el media ${mediaId}: ${response.status}`);
+      throw new ProviderError('kapso-media', response.status, await readErrorBody(response));
     }
 
     const payload = (await response.json()) as { url?: string };
@@ -118,19 +119,11 @@ export class KapsoClient implements Messenger {
     });
 
     if (!response.ok) {
-      throw new Error(`Kapso rechazó el mensaje: ${response.status} ${await safeText(response)}`);
+      throw new ProviderError('kapso', response.status, await readErrorBody(response));
     }
   }
 }
 
 function truncate(value: string, max: number): string {
   return value.length <= max ? value : `${value.slice(0, max - 1)}…`;
-}
-
-async function safeText(response: Response): Promise<string> {
-  try {
-    return (await response.text()).slice(0, 500);
-  } catch {
-    return '<sin cuerpo>';
-  }
 }

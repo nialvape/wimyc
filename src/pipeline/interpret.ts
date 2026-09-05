@@ -1,6 +1,8 @@
+import type { Logger } from 'pino';
 import { z } from 'zod';
 
 import { CITY_HINT } from '../places.js';
+import { errorFields } from '../providers/errors.js';
 import type { ChatProvider } from '../providers/llm.js';
 
 export const InterpretationSchema = z.object({
@@ -18,6 +20,7 @@ export interface InterpretContext {
   activeDescription: string | null;
   /** `true` si el texto viene de Whisper y puede tener errores de transcripción. */
   fromAudio: boolean;
+  logger: Logger;
 }
 
 const SYSTEM_PROMPT = `Sos el intérprete de WIMYC, un bot de WhatsApp que recuerda dónde quedó estacionado un auto.
@@ -91,15 +94,37 @@ export async function interpret(
     { role: 'user' as const, content: buildUserPrompt(text, context) },
   ];
 
-  for (let attempt = 0; attempt < ATTEMPTS; attempt += 1) {
+  for (let attempt = 1; attempt <= ATTEMPTS; attempt += 1) {
+    const startedAt = Date.now();
+
     try {
-      const parsed = safeParse(await provider.chatJson(messages));
-      if (parsed) return parsed;
+      const raw = await provider.chatJson(messages);
+      const parsed = safeParse(raw);
+
+      if (parsed) {
+        context.logger.debug(
+          { ms: Date.now() - startedAt, attempt, intent: parsed.intent, description: parsed.description },
+          'llm interpretó',
+        );
+        return parsed;
+      }
+
+      // Sin esto, un modelo que empezó a devolver prosa es indistinguible de
+      // uno que no entiende al usuario.
+      context.logger.warn(
+        { attempt, ms: Date.now() - startedAt, raw: raw.replace(/\s+/g, ' ').slice(0, 200) },
+        'el llm no devolvió el JSON que esperábamos',
+      );
     } catch (error) {
-      if (attempt === ATTEMPTS - 1) throw error;
+      context.logger.warn(
+        { ...errorFields(error), attempt, ms: Date.now() - startedAt },
+        attempt < ATTEMPTS ? 'el llm falló, reintento' : 'el llm falló en todos los intentos',
+      );
+      if (attempt === ATTEMPTS) throw error;
     }
   }
 
+  context.logger.warn({ attempts: ATTEMPTS }, 'no pude interpretar el mensaje, lo doy por unknown');
   return { intent: 'unknown', description: null, level: null, spot: null, confidence: 0 };
 }
 

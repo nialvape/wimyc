@@ -1,3 +1,5 @@
+import { ProviderError, readErrorBody } from './errors.js';
+
 /** Interfaz mínima de un proveedor de chat: nos alcanza con JSON de vuelta. */
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -68,15 +70,17 @@ export class OpenAICompatibleProvider implements ChatProvider {
     });
 
     if (!response.ok) {
-      const detail = await response.text().catch(() => '');
-      throw new Error(`${this.name} respondió ${response.status}: ${detail.slice(0, 300)}`);
+      throw new ProviderError(this.name, response.status, await readErrorBody(response));
     }
 
     const payload = (await response.json()) as {
       choices?: Array<{ message?: { content?: string } }>;
     };
     const content = payload.choices?.[0]?.message?.content;
-    if (!content) throw new Error(`${this.name} devolvió una respuesta vacía`);
+    // Los modelos de razonamiento a veces gastan toda la salida razonando y
+    // devuelven 200 con el content vacío. Es un fallo del proveedor, no un
+    // JSON inválido: hay que reintentar, no dar por perdida la interpretación.
+    if (!content) throw new ProviderError(this.name, 200, 'respuesta sin content');
     return content;
   }
 }

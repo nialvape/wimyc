@@ -1,4 +1,4 @@
-import { pino } from 'pino';
+import { pino, type Logger } from 'pino';
 
 import { AccessGate } from '../src/auth.js';
 import { openDatabase, type Db } from '../src/db/index.js';
@@ -9,6 +9,9 @@ import type { Transcriber } from '../src/providers/groq.js';
 import type { Button, Messenger } from '../src/providers/kapso.js';
 import type { ChatMessage, ChatProvider } from '../src/providers/llm.js';
 import type { InboundBase, InboundMessage } from '../src/types.js';
+
+/** Logger mudo, para los tests que llaman directo a las piezas del pipeline. */
+export const silentLogger = pino({ level: 'silent' });
 
 export const PASSWORD = 'la-contra';
 export const PHONE_A = '5491122334455';
@@ -97,7 +100,7 @@ export interface TestContext extends AppContext {
 }
 
 export function createTestContext(
-  options: { authorized?: string[]; pendingTtlMs?: number } = {},
+  options: { authorized?: string[]; pendingTtlMs?: number; logger?: Logger } = {},
 ): TestContext {
   const db = openDatabase(':memory:');
   const repo = new Repo(db);
@@ -110,7 +113,7 @@ export function createTestContext(
     llm: new ScriptedLlm(),
     transcriber: new ScriptedTranscriber(),
     gate: new AccessGate(repo, PASSWORD, 5),
-    logger: pino({ level: 'silent' }),
+    logger: options.logger ?? silentLogger,
     pendingTtlMs: options.pendingTtlMs ?? 30 * 60_000,
   };
 }

@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import { interpret } from '../src/pipeline/interpret.js';
 import type { ChatProvider } from '../src/providers/llm.js';
-import { ScriptedLlm } from './helpers.js';
+import { ScriptedLlm, silentLogger } from './helpers.js';
 
-const ctx = { hasActive: false, activeDescription: null, fromAudio: false };
+const ctx = { hasActive: false, activeDescription: null, fromAudio: false, logger: silentLogger };
 
 /** Proveedor que devuelve texto crudo, para probar el parseo defensivo. */
 function raw(...responses: string[]): ChatProvider {
@@ -91,6 +91,7 @@ describe('interpret', () => {
       hasActive: true,
       activeDescription: 'Cabildo 2200',
       fromAudio: true,
+      logger: silentLogger,
     });
 
     const prompt = llm.calls[0]!.at(-1)!.content;

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { CITY_HINT, STT_PROMPT } from '../src/places.js';
 import { interpret } from '../src/pipeline/interpret.js';
-import { ScriptedLlm } from './helpers.js';
+import { ScriptedLlm, silentLogger } from './helpers.js';
 
 describe('contexto geográfico', () => {
   it('a Whisper sólo le damos la pista del acento', () => {
@@ -19,6 +19,7 @@ describe('contexto geográfico', () => {
       hasActive: false,
       activeDescription: null,
       fromAudio: true,
+      logger: silentLogger,
     });
 
     const systemPrompt = llm.calls[0]!.find((message) => message.role === 'system')!.content;

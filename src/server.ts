@@ -1,4 +1,4 @@
-import Fastify from 'fastify';
+import Fastify, { LogController } from 'fastify';
 import type { Logger } from 'pino';
 
 import type { Repo } from './db/repo.js';
@@ -20,6 +20,10 @@ export async function buildServer(deps: ServerDeps): Promise<App> {
     loggerInstance: deps.logger,
     trustProxy: true,
     bodyLimit: 1_048_576,
+    // Fastify loguea dos líneas con el req y el res enteros por cada request.
+    // Con un solo endpoint eso es puro ruido: el webhook ya deja su propia
+    // línea y el pipeline deja una por mensaje.
+    logController: new LogController({ disableRequestLogging: true }),
   });
 
   app.get('/health', async () => ({ status: 'ok', uptime: Math.round(process.uptime()) }));
