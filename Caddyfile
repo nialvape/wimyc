@@ -1,0 +1,12 @@
+wimyc.sopia.app {
+	reverse_proxy app:3000
+
+	log {
+		output stdout
+		format console
+	}
+
+	# El webhook es el único endpoint público que importa; /health queda abierto
+	# para el healthcheck del propio compose.
+	encode zstd gzip
+}
