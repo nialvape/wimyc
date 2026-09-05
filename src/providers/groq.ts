@@ -9,6 +9,13 @@ export function createGroqProvider(config: Config): ChatProvider {
     apiKey: config.GROQ_API_KEY,
     model: config.GROQ_LLM,
     timeoutMs: config.HTTP_TIMEOUT_MS,
+    // Acotar el razonamiento deja presupuesto para el JSON. Sin esto gpt-oss
+    // se gasta la salida razonando y Groq rechaza la generación vacía con
+    // 400 json_validate_failed.
+    extraBody:
+      config.GROQ_REASONING_EFFORT === 'off'
+        ? {}
+        : { reasoning_effort: config.GROQ_REASONING_EFFORT },
   });
 }
 

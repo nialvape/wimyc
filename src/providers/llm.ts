@@ -49,6 +49,8 @@ export class OpenAICompatibleProvider implements ChatProvider {
       model: string;
       timeoutMs: number;
       extraHeaders?: Record<string, string>;
+      /** Campos extra del body, para parámetros propios de cada proveedor. */
+      extraBody?: Record<string, unknown>;
     },
   ) {}
 
@@ -63,8 +65,12 @@ export class OpenAICompatibleProvider implements ChatProvider {
       body: JSON.stringify({
         model: this.options.model,
         messages,
-        temperature: 0,
+        // 1 y no 0: los modelos de razonamiento están recomendados a
+        // temperature 1, y en 0 tienden a degenerar y devolver content vacío.
+        // El formato lo fija response_format, no la temperatura.
+        temperature: 1,
         response_format: { type: 'json_object' },
+        ...this.options.extraBody,
       }),
       signal: AbortSignal.timeout(this.options.timeoutMs),
     });

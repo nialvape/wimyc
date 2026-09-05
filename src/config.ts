@@ -19,6 +19,9 @@ const EnvSchema = z.object({
   GROQ_BASE_URL: z.string().url().default('https://api.groq.com/openai/v1'),
   GROQ_STT_MODEL: z.string().default('whisper-large-v3-turbo'),
   GROQ_LLM: z.string().min(1),
+  // Sólo lo entienden los modelos de razonamiento (gpt-oss). 'off' lo omite,
+  // para poder cambiar a un modelo que rechace el parámetro.
+  GROQ_REASONING_EFFORT: z.enum(['off', 'low', 'medium', 'high']).default('low'),
 
   // OpenRouter (fallback del LLM, opcional)
   OPENROUTER_API_KEY: z.string().optional(),
