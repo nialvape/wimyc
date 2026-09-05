@@ -9,8 +9,9 @@ services:
       DATABASE_PATH: /data/wimyc.db
     volumes:
       - ./data:/data
-    expose:
-      - "3000"
+    ports:
+      # Sólo en loopback: el que lo publica es el reverse proxy del host.
+      - "127.0.0.1:3000:3000"
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
@@ -18,9 +19,11 @@ services:
       retries: 3
       start_period: 10s
 
-  # Si el VPS ya tiene su propio reverse proxy, borrá este servicio y cambiá
-  # `expose` por `ports: ["127.0.0.1:3000:3000"]` en `app`.
+  # Caddy opcional, para un VPS que no tenga ya un reverse proxy. No arranca
+  # salvo que lo pidas: `docker compose --profile proxy up -d`.
+  # Si el host ya tiene uno, apuntalo a 127.0.0.1:3000 y no uses este perfil.
   caddy:
+    profiles: ["proxy"]
     image: caddy:2-alpine
     restart: unless-stopped
     depends_on:

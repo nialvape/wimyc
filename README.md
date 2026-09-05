@@ -63,8 +63,21 @@ npm run send-fixture text
 Corre en un VPS detrás de `https://wimyc.sopia.app`.
 
 ```bash
+mkdir -p data && chown 1000:1000 data   # sólo la primera vez
 docker compose up -d --build
 ```
+
+La app queda en `127.0.0.1:3000` y la publica el reverse proxy del host. Con
+Caddy, alcanza con agregarle:
+
+```
+wimyc.sopia.app {
+	reverse_proxy 127.0.0.1:3000
+}
+```
+
+Si el VPS no tiene ningún reverse proxy, hay uno incluido:
+`docker compose --profile proxy up -d --build`.
 
 Después registrar el webhook en Kapso (Integrations → Webhooks → Platform) apuntando a
 `https://wimyc.sopia.app/webhooks/kapso`, suscripto a `whatsapp.message.received`, con el mismo
