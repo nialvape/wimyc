@@ -59,6 +59,25 @@ describe('interpret', () => {
     });
   });
 
+  it('sobrevive a un error transitorio del proveedor', async () => {
+    // Groq tira 400 json_validate_failed cada tanto; al segundo intento sale.
+    const llm = new ScriptedLlm().push(new Error('groq 400 json_validate_failed'), {
+      intent: 'save',
+      description: 'Cabildo 2200',
+    });
+
+    expect((await interpret(llm, 'lo dejé en cabilo 2200', ctx)).description).toBe('Cabildo 2200');
+    expect(llm.calls).toHaveLength(2);
+  });
+
+  it('tira si el proveedor falla en los dos intentos', async () => {
+    // Que el servicio esté caído no es lo mismo que "no te entendí": el
+    // usuario tiene que recibir el mensaje de error, no uno de incomprensión.
+    const llm = new ScriptedLlm().push(new Error('groq 500'), new Error('groq 500'));
+
+    await expect(interpret(llm, 'lo dejé en cabilo 2200', ctx)).rejects.toThrow('groq 500');
+  });
+
   it('devuelve unknown si el intent no es uno de los nuestros', async () => {
     const provider = raw('{"intent":"borrar_todo","description":null,"level":null,"spot":null,"confidence":1}');
 

@@ -8,6 +8,11 @@ Kapso como proxy de WhatsApp, Groq para STT y LLM, OpenRouter como fallback del 
 - **El LLM sólo interpreta lenguaje natural** (texto libre y transcripciones de audio). Botones,
   contraseña, pins de ubicación y mensajes de error se resuelven con código. Nunca agregar una
   llamada al modelo para armar una respuesta que puede ser un template.
+- **Whisper transcribe, el LLM interpreta.** El prompt de Whisper es sólo una pista de acento; no
+  meterle una lista de calles, porque sesgar la decodificación pisa lo que el usuario realmente
+  dijo. Los nombres mal transcritos los corrige el LLM, que tiene el contexto para hacerlo.
+- **El contexto geográfico vive en `src/places.ts`.** Hoy es CABA. Si el auto se muda de ciudad,
+  ese archivo es lo único que hay que tocar.
 - **Todos los textos que ve el usuario viven en `src/reply/messages.ts`.** No hardcodear strings
   de respuesta en los handlers.
 - **Castellano rioplatense**, voseo, tono corto y seco. Sin "¡Hola! 😊 Soy tu asistente".

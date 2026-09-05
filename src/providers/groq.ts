@@ -1,4 +1,5 @@
 import type { Config } from '../config.js';
+import { STT_PROMPT } from '../places.js';
 import { OpenAICompatibleProvider, type ChatProvider } from './llm.js';
 
 export function createGroqProvider(config: Config): ChatProvider {
@@ -24,12 +25,9 @@ export class GroqTranscriber implements Transcriber {
     form.append('model', this.config.GROQ_STT_MODEL);
     form.append('language', 'es');
     form.append('response_format', 'json');
-    // Sesga la transcripción hacia el dominio: direcciones y cocheras.
-    form.append(
-      'prompt',
-      'Nota de voz en español rioplatense sobre dónde quedó estacionado un auto: ' +
-        'calles, alturas, esquinas, niveles de cochera y números de lugar.',
-    );
+    // Sólo una pista de acento. Whisper transcribe lo que escucha; corregir los
+    // nombres de calles es trabajo del LLM, que sabe en qué ciudad estamos.
+    form.append('prompt', STT_PROMPT);
 
     const response = await fetch(
       `${this.config.GROQ_BASE_URL.replace(/\/+$/, '')}/audio/transcriptions`,
