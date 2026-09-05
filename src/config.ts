@@ -32,7 +32,8 @@ const EnvSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
   HOST: z.string().default('0.0.0.0'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+  // Sin valor explícito el default depende del entorno: ver más abajo.
+  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).optional(),
   DATABASE_PATH: z.string().default('./data/wimyc.db'),
   DEFAULT_TZ: z.string().default('America/Argentina/Buenos_Aires'),
   PUBLIC_BASE_URL: z.string().url().optional(),
@@ -44,6 +45,7 @@ const EnvSchema = z.object({
 });
 
 export type Config = z.infer<typeof EnvSchema> & {
+  LOG_LEVEL: NonNullable<z.infer<typeof EnvSchema>['LOG_LEVEL']>;
   /** El fallback a OpenRouter sólo existe si están la key y el modelo. */
   openRouterEnabled: boolean;
 };
@@ -65,7 +67,14 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   }
 
   const openRouterEnabled = Boolean(parsed.data.OPENROUTER_API_KEY && parsed.data.OPENROUTER_MODEL);
-  cached = { ...parsed.data, openRouterEnabled };
+
+  // En desarrollo querés ver qué transcribió Whisper y qué entendió el LLM;
+  // en producción esa misma línea imprime la ubicación del auto en cada
+  // mensaje, así que ahí el default es info.
+  const logLevel =
+    parsed.data.LOG_LEVEL ?? (parsed.data.NODE_ENV === 'development' ? 'debug' : 'info');
+
+  cached = { ...parsed.data, LOG_LEVEL: logLevel, openRouterEnabled };
   return cached;
 }
 
