@@ -67,7 +67,12 @@ Normalizá los números dictados: "mil doscientos treinta y cuatro" -> "1234".
 Corregí sólo lo que es claramente un error de dictado. Si no reconocés el nombre, dejalo como vino.
 Nunca inventes una calle, una altura ni un dato que el usuario no dijo.
 
-Respondés únicamente con el JSON, sin texto alrededor ni bloques de código.`;
+FORMATO DE LA RESPUESTA
+Respondé ÚNICA Y ESTRICTAMENTE con un objeto JSON válido.
+No incluyas explicaciones, saludos, comentarios ni bloques de código markdown.
+No escribas nada antes de la primera llave ni después de la última.
+El primer carácter de tu respuesta tiene que ser { y el último tiene que ser }.
+Las cinco claves —intent, description, level, spot, confidence— van siempre, aunque el valor sea null.`;
 
 const ATTEMPTS = 2;
 
